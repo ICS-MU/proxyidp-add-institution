@@ -14,16 +14,19 @@ $ai_instance_name = 'ELIXIR';
 // contact
 $ai_contact = 'aai-contact@elixir-europe.org';
 
+// Proxy IdP hostname
+$ai_hostname = 'login.elixir-czech.org';
+
 // URL of the whitelist, fill in username/password if the URL is protected by BASIC auth
-$ai_whitelist_url = 'https://login.elixir-czech.org/proxy/module.php/elixir/whitelistedIdPs.php';
+$ai_whitelist_url = 'https://' . $ai_hostname . '/proxy/module.php/elixir/whitelistedIdPs.php';
 $ai_whitelist_username = '';
 $ai_whitelist_password = '';
 
 // URL of add to whitelist
-$ai_whitelist_idp = 'https://login2.elixir-czech.org/proxy/module.php/perun/protected/whitelistIdp.php';
+$ai_whitelist_idp = 'https://' . $ai_hostname . '/proxy/module.php/perun/protected/whitelistIdp.php';
 
 // URL for report the IdP
-$ai_report_idp = 'https://login.elixir-czech.org/proxy/module.php/elixir/reportIdP.php';
+$ai_report_idp = 'https://' . $ai_hostname . '/proxy/module.php/perun/reportIdP.php';
 
 // Log attempts
 $ai_results_file = '/var/tmp/add-institution-results';

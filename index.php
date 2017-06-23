@@ -55,20 +55,15 @@ $resultOnProxy = 'NOT_TRIED';
 # Send information to Proxy IdP if its OK. So it can be added
 if ($isOk) {
 	$resultOnProxy = 'ERROR';
-        $response3 = post('https://login3.elixir-czech.org/proxy/module.php/elixir/addIdPToWhitelist.php',
-                array(
-                        'entityId' => $_SERVER['sourceIdPEntityID']
-		)
-        );
-	$response2 = post($ai_whitelist_idp,
+	$response = post($ai_whitelist_idp,
                 array(
                         'entityId' => $_SERVER['sourceIdPEntityID'],
                 	'reason' => "Attributes checked by user"
 		)
         );
 
-	if (!empty($response3) && isJson($response3) && !empty($response2) && isJson($response2)) {
-		$json = json_decode($response3, true);
+	if (!empty($response) && isJson($response)) {
+		$json = json_decode($response, true);
 		$resultOnProxy = $json['result'];
 		if ($resultOnProxy === 'ERROR') {
 			$resultOnProxy .= ", error msg: ".$json['msg'];
@@ -199,7 +194,7 @@ EOD;
 	</div>
 	<hr>
 EOD;
-	echo reportBox('Please <b>report</b> it so that we can add your institution to the ' . $ai_instance_name . ' AAI', 'https://login.elixir-czech.org/proxy/module.php/elixir/reportIdP.php', $model, !empty($_GET['mailSended']));
+	echo reportBox('Please <b>report</b> it so that we can add your institution to the ' . $ai_instance_name . ' AAI', $ai_report_idp, $model, !empty($_GET['mailSended']));
 
 }
 ?>
