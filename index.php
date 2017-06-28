@@ -4,21 +4,30 @@ require_once('config.php');
 ///////////////// model preparation ///////////////
 
 // Omit php warnings in logs
-$_SERVER += defineOnArray($_SERVER, array('eppn', 'persistent-id', 'affiliation', 'unscoped-affiliation', 'schacHomeOrganization', 'mail', 'displayName'));
+$_SERVER += defineOnArray($_SERVER, array('eppn', 'persistent-id', 'affiliation', 'unscoped-affiliation', 'schacHomeOrganization', 'mail', 'displayName','o','sourceIdPEntityID'));
 
+$eppn = $_SERVER['eppn'];
+$persistentId = $_SERVER['persistent-id'];
+$affiliation = $_SERVER['affiliation'];
+$unscopedAffiliation = $_SERVER['unscoped-affiliation'];
+$schacHomeOrganization = $_SERVER['schacHomeOrganization'];
+$mail = $_SERVER['mail'];
+$displayName = $_SERVER['displayName'];
+$sourceIdPEntityID = $_SERVER['sourceIdPEntityID'];
+$o = $_SERVER['o'];
 
 $hasUid = false;
 $hasAffiliation = false;
 $hasOrganization = false;
 
 
-if (isset($_SERVER["eppn"]) or isset($_SERVER["persistent-id"])) {
+if (isset($eppn) or isset($persistentId)) {
 	$hasUid = true;
 }
-if (isset($_SERVER["affiliation"]) or isset($_SERVER["unscoped-affiliation"])) {
+if (isset($affiliation) or isset($unscopedAffiliation)) {
 	$hasAffiliation = true;
 }
-if (isset($_SERVER["schacHomeOrganization"])) {
+if (isset($schacHomeOrganization)) {
 	$hasOrganization = true;
 }
 
@@ -26,14 +35,14 @@ if (isset($_SERVER["schacHomeOrganization"])) {
 $isOk = $hasUid && $hasOrganization && $hasAffiliation;
 
 
-$idpEntityId = $_SERVER['sourceIdPEntityID'];
+$idpEntityId = $sourceIdPEntityID;
 
 
 $idpDisplayName;
-if (!empty($_SERVER['o'])) {
-        $idpDisplayName = $_SERVER['o'];
-} else if (!empty($_SERVER['schacHomeOrganization'])) {
-        $idpDisplayName = $_SERVER['schacHomeOrganization'];
+if (!empty($o)) {
+        $idpDisplayName = $o;
+} else if (!empty($schacHomeOrganization)) {
+        $idpDisplayName = $schacHomeOrganization;
 } else if (!empty($idpEntityId)) {
         $entityIdUrl = parse_url($idpEntityId);
         if (!$entityIdUrl) {
@@ -48,7 +57,7 @@ if (!empty($_SERVER['o'])) {
 
 
 # Store information about the session, format: date - IdP - result
-$resultInFile = file_put_contents($ai_results_file, date("Y-m-d H:i:s") . ' - ' . $_SERVER['sourceIdPEntityID'] . ' - ' . ($isOk ? 1 : 0) . "\n", FILE_APPEND);
+$resultInFile = file_put_contents($ai_results_file, date("Y-m-d H:i:s") . ' - ' . $sourceIdPEntityID . ' - ' . ($isOk ? 1 : 0) . "\n", FILE_APPEND);
 $resultInFile = ($resultInFile === false) ? false : true;
 
 $resultOnProxy = 'NOT_TRIED';
@@ -57,7 +66,7 @@ if ($isOk) {
 	$resultOnProxy = 'ERROR';
 	$response = post($ai_whitelist_idp,
                 array(
-                        'entityId' => $_SERVER['sourceIdPEntityID'],
+                        'entityId' => $sourceIdPEntityID,
                 	'reason' => "Attributes checked by user"
 		)
         );
@@ -225,23 +234,23 @@ echo <<<EOD
         <h4>Your IdP sends</h4>
         <ul>
                 <li>
-                        eduPersonPrincipalName: <b>{$_SERVER["eppn"]}</b>
+                        eduPersonPrincipalName: <b>{$eppn}</b>
                         <i>- or -</i> 
-                        eduPersonTargetedId/persistentID: <b>{$_SERVER["persistent-id"]} </b>
+                        eduPersonTargetedId/persistentID: <b>{$persistentId} </b>
 EOD;
 echo '<span class="glyphicon glyphicon-' . ($hasUid?'ok':'remove') . '" style="color: ' . ($hasUid?'green':'red') . ';"></span>';
 echo <<<EOD
                 </li>
                 <li>
-                        eduPersonAffiliation: <b>{$_SERVER["unscoped-affiliation"]}</b>  
+                        eduPersonAffiliation: <b>{$unscopedAffiliation}</b>  
                         <i>- or -</i>
-                        eduPersonScopedAffiliation: <b>{$_SERVER["affiliation"]} </b> 
+                        eduPersonScopedAffiliation: <b>{$affiliation} </b> 
 EOD;
 echo '<span class="glyphicon glyphicon-' . ($hasAffiliation?'ok':'remove') . '" style="color: ' . ($hasAffiliation?'green':'red') . ';"></span>';
 echo <<<EOD
                 </li>
                 <li>
-                        schacHomeOrganization: <b>{$_SERVER["schacHomeOrganization"]} </b> 
+                        schacHomeOrganization: <b>{$schacHomeOrganization} </b> 
 EOD;
 echo '<span class="glyphicon glyphicon-' . ($hasOrganization?'ok':'remove') . '" style="color: ' . ($hasOrganization?'green':'red') . ';"></span>';
 echo <<<EOD
@@ -269,10 +278,10 @@ echo <<<EOD
         <h4>Your IdP sends</h4>
         <ul>
                 <li>
-                        displayName: <b>{$_SERVER["displayName"]} </b>
+                        displayName: <b>{$displayName} </b>
                 </li>
                 <li>
-                        mail: <b>{$_SERVER["mail"]} </b>
+                        mail: <b>{$mail} </b>
                 </li>
         </ul>
 EOD;
