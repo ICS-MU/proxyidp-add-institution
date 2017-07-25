@@ -4,17 +4,17 @@ require_once('config.php');
 ///////////////// model preparation ///////////////
 
 // Omit php warnings in logs
-$_SERVER += defineOnArray($_SERVER, array('eppn', 'persistent-id', 'affiliation', 'unscoped-affiliation', 'schacHomeOrganization', 'mail', 'displayName','o','sourceIdPEntityID'));
+$_SERVER += defineOnArray($_SERVER, array('HTTP_AJP_EPPN', 'HTTP_AJP_PERSISTENT-ID', 'HTTP_AJP_AFFILIATION', 'HTTP_AJP_UNSCOPED-AFFILIATION', 'HTTP_AJP_SCHACHOMEORGANIZATION', 'HTTP_AJP_MAIL', 'HTTP_AJP_DISPLAYNAME','HTTP_AJP_O','HTTP_AJP_SOURCEIDPENTITYID'));
 
-$eppn = $_SERVER['eppn'];
-$persistentId = $_SERVER['persistent-id'];
-$affiliation = $_SERVER['affiliation'];
-$unscopedAffiliation = $_SERVER['unscoped-affiliation'];
-$schacHomeOrganization = $_SERVER['schacHomeOrganization'];
-$mail = $_SERVER['mail'];
-$displayName = $_SERVER['displayName'];
-$sourceIdPEntityID = $_SERVER['sourceIdPEntityID'];
-$o = $_SERVER['o'];
+$eppn = $_SERVER['HTTP_AJP_EPPN'];
+$persistentId = $_SERVER['HTTP_AJP_PERSISTENT-ID'];
+$affiliation = $_SERVER['HTTP_AJP_AFFILIATION'];
+$unscopedAffiliation = $_SERVER['HTTP_AJP_UNSCOPED-AFFILIATION'];
+#$schacHomeOrganization = $_SERVER['HTTP_AJP_SCHACHOMEORGANIZATION'];
+$mail = $_SERVER['HTTP_AJP_MAIL'];
+$displayName = $_SERVER['HTTP_AJP_DISPLAYNAME'];
+$sourceIdPEntityID = $_SERVER['HTTP_AJP_SOURCEIDPENTITYID'];
+$o = $_SERVER['HTTP_AJP_O'];
 
 $hasUid = false;
 $hasAffiliation = false;
@@ -22,17 +22,18 @@ $hasOrganization = false;
 
 
 if (isset($eppn) or isset($persistentId)) {
-	$hasUid = true;
+        $hasUid = true;
 }
 if (isset($affiliation) or isset($unscopedAffiliation)) {
-	$hasAffiliation = true;
+        $hasAffiliation = true;
 }
 if (isset($schacHomeOrganization)) {
-	$hasOrganization = true;
+        $hasOrganization = true;
 }
 
 
-$isOk = $hasUid && $hasOrganization && $hasAffiliation;
+#$isOk = $hasUid && $hasOrganization && $hasAffiliation;
+$isOk = $hasUid && $hasAffiliation;
 
 
 $idpEntityId = $sourceIdPEntityID;
@@ -63,34 +64,34 @@ $resultInFile = ($resultInFile === false) ? false : true;
 $resultOnProxy = 'NOT_TRIED';
 # Send information to Proxy IdP if its OK. So it can be added
 if ($isOk) {
-	$resultOnProxy = 'ERROR';
-	$response = post($ai_whitelist_idp,
+        $resultOnProxy = 'ERROR';
+        $response = post($ai_whitelist_idp,
                 array(
                         'entityId' => $sourceIdPEntityID,
-                	'reason' => "Attributes checked by user"
-		)
+                        'reason' => "Attributes checked by user"
+                )
         );
 
-	if (!empty($response) && isJson($response)) {
-		$json = json_decode($response, true);
-		$resultOnProxy = $json['result'];
-		if ($resultOnProxy === 'ERROR') {
-			$resultOnProxy .= ", error msg: ".$json['msg'];
-		}
-	}
+        if (!empty($response) && isJson($response)) {
+                $json = json_decode($response, true);
+                $resultOnProxy = $json['result'];
+                if ($resultOnProxy === 'ERROR') {
+                        $resultOnProxy .= ", error msg: ".$json['msg'];
+                }
+        }
 }
 
 # set whole model into one var to easier manipulation
 $model = array(
-	'isOk' => $isOk,
-	'hasUid' => $hasUid,
-	'hasAffiliation' => $hasAffiliation,
-	'hasOrganization' => $hasOrganization,
-	'idpDisplayName' => $idpDisplayName,
-	'resultInFile' => $resultInFile,
-	'resultOnProxy' => $resultOnProxy,
-	'idpEntityId' => $idpEntityId,
-); 
+        'isOk' => $isOk,
+        'hasUid' => $hasUid,
+        'hasAffiliation' => $hasAffiliation,
+        'hasOrganization' => $hasOrganization,
+        'idpDisplayName' => $idpDisplayName,
+        'resultInFile' => $resultInFile,
+        'resultOnProxy' => $resultOnProxy,
+        'idpEntityId' => $idpEntityId,
+);
 
 
 
@@ -119,59 +120,59 @@ $model = array(
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     
     <style>
-	.logo {
-		display: block;
-		width: 170px;
-		margin: 24px auto;
-	}
-	.result {
-		margin: 28px 0; 
-	}
-	.result hr {
-		margin-top: 8px;
-		margin-bottom: 8px; 
-		border-color: #ddd;
-	}
-	.result h1:first-child,
-	.result h2:first-child, 
-	.result h3:first-child,
-	.result h4:first-child {
-		margin-top: 0;
-	}
+        .logo {
+                display: block;
+                width: 170px;
+                margin: 24px auto;
+        }
+        .result {
+                margin: 28px 0;
+        }
+        .result hr {
+                margin-top: 8px;
+                margin-bottom: 8px;
+                border-color: #ddd;
+        }
+        .result h1:first-child,
+        .result h2:first-child,
+        .result h3:first-child,
+        .result h4:first-child {
+                margin-top: 0;
+        }
         .result h1:last-child,
         .result h2:last-child,
         .result h3:last-child,
         .result h4:last-child {
                 margin-bottom: 0;
         }
-	.panel-more {
-		margin: -11px 11px 11px -11px;
-		padding: 0 4px;
-		background: white;
-	}
-	.report-box .form-horizontal .control-label {
-		text-align: left;
-	}
+        .panel-more {
+                margin: -11px 11px 11px -11px;
+                padding: 0 4px;
+                background: white;
+        }
+        .report-box .form-horizontal .control-label {
+                text-align: left;
+        }
     </style>
 
 </head>
 <body>
 <div class="container">
-	<img class="logo" lt="logo" src="<?php echo $ai_logo;?>">
+        <img class="logo" lt="logo" src="<?php echo $ai_logo;?>">
 
 
-	<p>This application tests the compatibility of your identity provider with the <?php echo $ai_instance_name;?> AAI (Authentication and Authorisation Infrastructure). The results are automatically stored and used to determine if identity providers are ready to join the <?php echo $ai_instance_name;?> AAI.</p>
+        <p>This application tests the compatibility of your identity provider with the <?php echo $ai_instance_name;?> AAI (Authentication and Authorisation Infrastructure). The results are automatically stored and used to determine if identity providers are ready to join the <?php echo $ai_instance_name;?> AAI.</p>
 
-	<div class="result panel panel-default">
+        <div class="result panel panel-default">
 
 <?php
 if ($isOk and $resultOnProxy === 'ALREADY_THERE') {
-	// is OK and has been added
-	echo <<<EOD
-	<div class="panel-body">
-	    <h2>Your institution <i>$idpDisplayName</i> is <span class="label label-success">already in the $ai_instance_name AAI</span></h2>
-	    <h4>You can access your service with it</h4>
-	</div>
+        // is OK and has been added
+        echo <<<EOD
+        <div class="panel-body">
+            <h2>Your institution <i>$idpDisplayName</i> is <span class="label label-success">already in the $ai_instance_name AAI</span></h2>
+            <h4>You can access your service with it</h4>
+        </div>
 EOD;
 
 
@@ -186,85 +187,43 @@ EOD;
 
 
 } else if ($isOk) {
-	// is OK but not added
+        // is OK but not added
         echo <<<EOD
         <div class="panel-body">
-	    <h2>Your institution <i>$idpDisplayName</i> <span class="text-success">is compatible</span> with the $ai_instance_name AAI but we had <span class="label label-warning">problem to add it automatically</span></h2>
-	</div>
+            <h2>Your institution <i>$idpDisplayName</i> <span class="text-success">is compatible</span> with the $ai_instance_name AAI but we had <span class="label label-warning">problem to add it automatically</span></h2>
+        </div>
 EOD;
         echo reportBox('Please try to <b>refresh this page</b> or report it so we can add it manually', $ai_report_idp, $model, !empty($_GET['mailSended']));
 
-
 } else {
-	// is NOT OK
+        // is NOT OK
         echo <<<EOD
         <div class="panel-body">
-		<h2>Your institution <i>$idpDisplayName</i> can not be added because it is <span class="label label-danger">not compatible</span> with the $ai_instance_name AAI</h2>
-	</div>
-	<hr>
+                <h2>Your institution <i>$idpDisplayName</i> can not be added because it is <span class="label label-danger">not compatible</span> with the $ai_instance_name AAI</h2>
+        </div>
+        <hr>
 EOD;
-	echo reportBox('Please <b>report</b> it so that we can add your institution to the ' . $ai_instance_name . ' AAI', $ai_report_idp, $model, !empty($_GET['mailSended']));
+        echo reportBox('Please <b>report</b> it so that we can add your institution to the ' . $ai_instance_name . ' AAI', $ai_report_idp, $model, !empty($_GET['mailSended']));
 
 }
 ?>
-		<div id="moreInfo" class="collapse">
-		<hr>	
-	
-       			<div class="panel-body">
+                <div id="moreInfo" class="collapse">
+                <hr>
 
-	<h4><?php echo $ai_instance_name;?> AAI requires following attributes</h4>
-	<ul>
-		<li>
-			eduPersonPrincipalName <small><span class="label label-default">urn:oid:1.3.6.1.4.1.5923.1.1.1.6</span></small> 
-			<i>- or -</i> 
-			eduPersonTargetedId/persistentID <small><span class="label label-default">urn:oid:1.3.6.1.4.1.5923.1.1.1.10</span></small>
-		</li>
-		<li>
-			eduPersonAffiliation <small><span class="label label-default">urn:oid:1.3.6.1.4.1.5923.1.1.1.1</span></small>
-			<i>- or -</i>
-			eduPersonScopedAffiliation <small><span class="label label-default">urn:oid:1.3.6.1.4.1.5923.1.1.1.9</span></small>
-		</li>
-		<li>
-			schacHomeOrganization <small><span class="label label-default">urn:oid:1.3.6.1.4.1.25178.1.2.9</span></small>
-		</li>
-	</ul>
+                        <div class="panel-body">
 
-<?php
-echo <<<EOD
-        <h4>Your IdP sends</h4>
+        <h4><?php echo $ai_instance_name;?> AAI requires following attributes</h4>
         <ul>
                 <li>
-                        eduPersonPrincipalName: <b>{$eppn}</b>
-                        <i>- or -</i> 
-                        eduPersonTargetedId/persistentID: <b>{$persistentId} </b>
-EOD;
-echo '<span class="glyphicon glyphicon-' . ($hasUid?'ok':'remove') . '" style="color: ' . ($hasUid?'green':'red') . ';"></span>';
-echo <<<EOD
-                </li>
-                <li>
-                        eduPersonAffiliation: <b>{$unscopedAffiliation}</b>  
+                        eduPersonPrincipalName <small><span class="label label-default">urn:oid:1.3.6.1.4.1.5923.1.1.1.6</span></small>
                         <i>- or -</i>
-                        eduPersonScopedAffiliation: <b>{$affiliation} </b> 
-EOD;
-echo '<span class="glyphicon glyphicon-' . ($hasAffiliation?'ok':'remove') . '" style="color: ' . ($hasAffiliation?'green':'red') . ';"></span>';
-echo <<<EOD
+                        eduPersonTargetedId/persistentID <small><span class="label label-default">urn:oid:1.3.6.1.4.1.5923.1.1.1.10</span></small>
                 </li>
                 <li>
-                        schacHomeOrganization: <b>{$schacHomeOrganization} </b> 
-EOD;
-echo '<span class="glyphicon glyphicon-' . ($hasOrganization?'ok':'remove') . '" style="color: ' . ($hasOrganization?'green':'red') . ';"></span>';
-echo <<<EOD
-
+                        eduPersonAffiliation <small><span class="label label-default">urn:oid:1.3.6.1.4.1.5923.1.1.1.1</span></small>
+                        <i>- or -</i>
+                        eduPersonScopedAffiliation <small><span class="label label-default">urn:oid:1.3.6.1.4.1.5923.1.1.1.9</span></small>
                 </li>
-        </ul>
-EOD;
-?>
-
-
-
-
-        <h4><?php echo $ai_instance_name;?> AAI optionally consumes following attributes</h4>
-        <ul>
                 <li>
                         displayName <small><span class="label label-default">urn:oid:2.16.840.1.113730.3.1.241</span></small>
                 </li>
@@ -273,10 +232,26 @@ EOD;
                 </li>
         </ul>
 
-<?php   
+<?php
 echo <<<EOD
         <h4>Your IdP sends</h4>
         <ul>
+                <li>
+                        eduPersonPrincipalName: <b>{$eppn}</b>
+                        <i>- or -</i>
+                        eduPersonTargetedId/persistentID: <b>{$persistentId} </b>
+EOD;
+echo '<span class="glyphicon glyphicon-' . ($hasUid?'ok':'remove') . '" style="color: ' . ($hasUid?'green':'red') . ';"></span>';
+echo <<<EOD
+                </li>
+                <li>
+                        eduPersonAffiliation: <b>{$unscopedAffiliation}</b>
+                        <i>- or -</i>
+                        eduPersonScopedAffiliation: <b>{$affiliation} </b>
+EOD;
+echo '<span class="glyphicon glyphicon-' . ($hasAffiliation?'ok':'remove') . '" style="color: ' . ($hasAffiliation?'green':'red') . ';"></span>';
+echo <<<EOD
+                </li>
                 <li>
                         displayName: <b>{$displayName} </b>
                 </li>
@@ -286,16 +261,13 @@ echo <<<EOD
         </ul>
 EOD;
 ?>
+                        </div>
 
+                </div>
 
+                <a class="pull-right panel-more" data-toggle="collapse" href="#moreInfo">technical info</a>
 
-        		</div>
-
-		</div>
-
-		<a class="pull-right panel-more" data-toggle="collapse" href="#moreInfo">technical info</a>
-
-	</div>
+        </div>
 
 
 </div>
@@ -325,35 +297,31 @@ EOD;
 ////////// Functions //////////////
 
 function post($url, $params) {
-	global $ai_whitelist_username, $ai_whitelist_password;
-	
-	$options = array(
-    		'http' => array(
-        		'header'  => array(
-				"Content-type: application/x-www-form-urlencoded",
-				"Authorization: Basic " . base64_encode("$ai_whitelist_username:$ai_whitelist_password"),
-			),
-        		'method'  => 'POST',
-        		'content' => http_build_query($params)
-    		)
-	);
-	$context  = stream_context_create($options);
-	$result = file_get_contents($url, false, $context);        
+        global $ai_whitelist_username, $ai_whitelist_password;
 
-	return $result; 
+        $options = array(
+                'http' => array(
+                        'header'  => array(
+                                "Content-type: application/x-www-form-urlencoded",
+                                "Authorization: Basic " . base64_encode("$ai_whitelist_username:$ai_whitelist_password"),
+                        ),
+                        'method'  => 'POST',
+                        'content' => http_build_query($params)
+                )
+        );
+        $context  = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+
+        return $result;
 }
 
 
 
 
 function isJson($string) {
-	json_decode($string);
-	return (json_last_error() == JSON_ERROR_NONE);
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
 }
-
-
-
-
 
 function startsWith($string, $start)
 {
@@ -366,12 +334,12 @@ function startsWith($string, $start)
 
 function defineOnArray($array, $attrs) {
 
-	foreach ($attrs as $attr) {
-		if (!isset($array[$attr])) {
-			$array[$attr] = NULL;
-		}
-	}
-	return $array;
+        foreach ($attrs as $attr) {
+                if (!isset($array[$attr])) {
+                        $array[$attr] = NULL;
+                }
+        }
+        return $array;
 
 }
 
@@ -380,12 +348,12 @@ function defineOnArray($array, $attrs) {
 
 function reportBox($title, $url, $data, $sended=false) {
 
-	$time = date("Y-m-d H:i:s");
-	$redirectUri = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-	$box = <<<EOD
+        $time = date("Y-m-d H:i:s");
+        $redirectUri = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $box = <<<EOD
 <div class="panel-body report-box">
     <h4>{$title}</h4>
- 
+
     <form action="{$url}" method="post" class="fform-horizontal">
 
         <div class="form-group">
@@ -398,39 +366,39 @@ function reportBox($title, $url, $data, $sended=false) {
                 <textarea name="body" class="form-control" rows="2" placeholder="We automatically attach all necessary data, but feel free to comment."></textarea>
         </div>
 
-	<input type='hidden' name='title' value='Attr check of {$data['idpDisplayName']}, user report'>
-	<input type='hidden' name='time' value='{$time}'>
-	<input type='hidden' name='redirectUri' value='{$redirectUri}'>
+        <input type='hidden' name='title' value='Attr check of {$data['idpDisplayName']}, user report'>
+        <input type='hidden' name='time' value='{$time}'>
+        <input type='hidden' name='redirectUri' value='{$redirectUri}'>
 EOD;
-	foreach ($data as $key => $value) {
-		$value = $value===true ? 'true' : $value;
-        	$value = $value===false ? 'false' : $value;
-		$box .= "<input type='hidden' name='{$key}' value='{$value}'>";
-	}
-	$box .= <<<EOD
+        foreach ($data as $key => $value) {
+                $value = $value===true ? 'true' : $value;
+                $value = $value===false ? 'false' : $value;
+                $box .= "<input type='hidden' name='{$key}' value='{$value}'>";
+        }
+        $box .= <<<EOD
         <button type="submit" name="send" class="btn btn-primary">Report</button>
 
-	<span style="margin: 7px;">Thanks for cooperation</span>
+        <span style="margin: 7px;">Thanks for cooperation</span>
 
     </form>
 </div>
 EOD;
 
 
-	$closeUrl = exludeParamFromUrl($redirectUri, 'mailSended');
-	$sendedBox = <<<EOD
+        $closeUrl = exludeParamFromUrl($redirectUri, 'mailSended');
+        $sendedBox = <<<EOD
 <div class="panel-body">
 
     <div class="alert alert-success" role="alert">
-	<a href="$closeUrl" class="close"><span>&times;</span></a>
-	<h4>The report has been submitted</h4>
-	Thanks for cooperation
+        <a href="$closeUrl" class="close"><span>&times;</span></a>
+        <h4>The report has been submitted</h4>
+        Thanks for cooperation
     </div>
 
 </div>
 EOD;
 
-	return $sended ? $sendedBox : $box;
+        return $sended ? $sendedBox : $box;
 }
 
 
@@ -440,15 +408,15 @@ EOD;
 
 function exludeParamFromUrl($url, $paramName) {
 
-	$parseUrl = parse_url($url);
-	if (empty($parseUrl['query'])) {
-		$parseQuery = array();
-	} else {
-		parse_str($parseUrl['query'], $parseQuery);
-	}
-	unset($parseQuery[$paramName]);
-	$parseUrl['query'] = http_build_query($parseQuery);
-	return build_url($parseUrl);	
+        $parseUrl = parse_url($url);
+        if (empty($parseUrl['query'])) {
+                $parseQuery = array();
+        } else {
+                parse_str($parseUrl['query'], $parseQuery);
+        }
+        unset($parseQuery[$paramName]);
+        $parseUrl['query'] = http_build_query($parseQuery);
+        return build_url($parseUrl);
 
 }
 
@@ -483,7 +451,7 @@ function build_url($parsUrl) {
         if (!empty($parsUrl['fragment'])) {
                 $url .= "#" . $parsUrl['fragment'];
         }
-        
+
         return $url;
 }
 
