@@ -234,7 +234,7 @@ EOD;
 
 <?php
 echo <<<EOD
-        <h4>Your IdP sends</h4>
+        <h4>Your IdP sent</h4>
         <ul>
                 <li>
                         eduPersonPrincipalName: <b>{$eppn}</b>
