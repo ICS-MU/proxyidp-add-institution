@@ -22,11 +22,15 @@ $ai_whitelist_url = 'https://' . $ai_hostname . '/proxy/module.php/elixir/whitel
 $ai_whitelist_username = '';
 $ai_whitelist_password = '';
 
+
 // URL of add to whitelist
 $ai_whitelist_idp = 'https://' . $ai_hostname . '/proxy/module.php/perun/protected/whitelistIdp.php';
 
+// URL of the report, fill in username/password if the URL is protected by BASIC auth
+$ai_report_url = 'https://' . $ai_hostname . '/proxy/module.php/elixir/reportIdp.php';
+
 // URL for report the IdP
-$ai_report_idp = 'https://' . $ai_hostname . '/proxy/module.php/perun/reportIdP.php';
+$ai_report_idp = 'https://' . $ai_hostname . '/proxy/module.php/perun/protected/reportIdp.php';
 
 // Log attempts
 $ai_results_file = '/var/tmp/add-institution-results';
